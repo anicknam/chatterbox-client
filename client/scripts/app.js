@@ -54,15 +54,21 @@ app.clearMessages = function() {
 };
 
 app.renderMessage = function(message) {
+  
+  var $div = $('<div></div>');
+  $div.addClass(message.objectId);
+  var func = function(type) {
+    var $newDOM = $('<span></span><br>');
+    $newDOM.addClass(type);
+    $($newDOM).text((type === 'username') ? '@' + message[type] : message[type]);
+    $($div).append($newDOM);
+  };
 
-  var newDOM = $('<span></span>');
-  newDOM.addClass('username');
-  newDOM.addClass(message.objectId);
-  $('#chats').append(newDOM);
-  $('.' + message.objectId).text(message.text);
-  // $('#chats').append('<div><span class = "username"' + message.objectId + "></span><span class="message"></span></div>');
-  // $('.username').text('@' + message['username'] + ': '); 
-  // $('.message').text(message['text']);
+  func('username');
+  func('text');
+  $('#chats').append($div);
+  
+
 };
 
 app.renderRoom = function(roomName) {
