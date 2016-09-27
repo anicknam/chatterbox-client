@@ -36,7 +36,7 @@ app.fetch = function() {
     success: function (data) {
       console.log(data);
       for ( var i = 0; i < data['results'].length; i++) {
-        console.log(data['results'][i].text);
+        //console.log(data['results'][i].text);
         app.renderMessage(data['results'][i]);
       }
     },
@@ -55,8 +55,14 @@ app.clearMessages = function() {
 
 app.renderMessage = function(message) {
 
-  $('#chats').append('<div>' + message['text'] + '</div>');
-
+  var newDOM = $('<span></span>');
+  newDOM.addClass('username');
+  newDOM.addClass(message.objectId);
+  $('#chats').append(newDOM);
+  $('.' + message.objectId).text(message.text);
+  // $('#chats').append('<div><span class = "username"' + message.objectId + "></span><span class="message"></span></div>');
+  // $('.username').text('@' + message['username'] + ': '); 
+  // $('.message').text(message['text']);
 };
 
 app.renderRoom = function(roomName) {
