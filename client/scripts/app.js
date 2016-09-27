@@ -1,10 +1,8 @@
-
-
-  // YOUR CODE HERE:
+// YOUR CODE HERE:
   var app = {};
 
   app.init = function() {
-
+    //$('.username').on('click', app.handleUsernameClick);
   };
 
   app.send = function(message) {
@@ -89,8 +87,7 @@
 
   $(document).ready(function() {
     $('body').on('click', '.username', function() {
-      console.log('hello');
-      app.handleUsernameClick();
+      app.handleUsernameClick.call(this);
     });    
   });
 
