@@ -1,5 +1,7 @@
 // YOUR CODE HERE:
-  var app = {};
+  var app = {
+    currRoom: 'lobby'
+  };
 
   app.init = function() {
     //$('.username').on('click', app.handleUsernameClick);
@@ -9,9 +11,9 @@
     var message = {
       username: window.location.search.replace('?username=', ''),
       text: $('.message').val(),
-      roomname: 'lobby'
+      roomname: app.currRoom
     };
-    console.log(message);
+
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: 'https://api.parse.com/1/classes/messages',
@@ -29,19 +31,31 @@
 
   };
 
-  app.fetch = function() {
+  app.fetch = function(roomName) {
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: 'https://api.parse.com/1/classes/messages',
       type: 'GET',
+      data: {order: '-createdAt'},
       contentType: 'application/json',
       success: function (data) {
-        //console.log(data);
-        app.addRooms(data['results']);
-        for ( var i = 0; i < data['results'].length; i++) {
-          //console.log(data['results'][i].text);
-          app.renderMessage(data['results'][i]);
+        app.allMessages = data['results'];
+        app.clearMessages();
+        app.clearRooms();
+        app.addRooms(app.allMessages);
+        if (roomName) {
+
+          app.allMessages.forEach(function(message) {
+            if (JSON.stringify(message.roomname) === roomName) {
+              app.renderMessage(message);
+            }
+          });
+        } else {
+          app.allMessages.forEach(function(message) {
+            app.renderMessage(message);
+          });         
         }
+
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -57,7 +71,7 @@
 
   app.renderMessage = function(message) {
     
-    var $div = $('<div></div>');
+    var $div = $('<div class = "chatBox"></div>');
     $div.addClass(message.objectId);
     var func = function(type) {
       if (type === 'username') {
@@ -66,7 +80,7 @@
         var $newDOM = $('<span></span><br>');
       }
       $newDOM.addClass(type);
-      $($newDOM).text((type === 'username') ? '@' + message[type] : message[type]);
+      $($newDOM).text((type === 'username') ? '@' + JSON.stringify(message[type]) : JSON.stringify(message[type]));
       $($div).append($newDOM);
     };
 
@@ -93,13 +107,14 @@
 
     $('body').on('click', '.submitButton', function() {
       app.send();
+      $('.message').val('');
     });
 
     $('body').on('click', '.dropbtn', function() {
       //console.log('hello')
       dropDownButton();
     });
-    
+
     window.onclick = function(event) {
       if (!event.target.matches('.dropbtn')) {
 
@@ -114,19 +129,40 @@
       }
     };
 
+    $('body').on('click', '.refresh', function() {
+      console.log(app.currRoom);
+      //app.currRoom = JSON.stringify(app.currRoom);
+      app.fetch(app.currRoom);
+    });
+
+    $('body').on('click', 'a', function() {
+
+      if (this.innerHTML === 'add room') {
+        var newRoom = prompt('Enter room name', 'here');
+        $('.dropdown-content').append('<a class ="' + newRoom + '">' + newRoom + '</a>');
+      } else {
+        app.currRoom = this.innerHTML;
+        app.fetch(app.currRoom);
+      }
+    });
   });
   
   app.addRooms = function(allMessage) {
+
     var allRooms = {};
+    //debugger;
+    $('.dropdown-content').append('<a class ="addRoom">Add oom...</a>');
     for (var i = 0; i < allMessage.length; i++) {
       allRooms[JSON.stringify(allMessage[i].roomname)] = true;
     }
     
     for (var room in allRooms) {
-      var $room = $('<a>' + room + '</a>');
+      var $room = $('<a class="' + room + '">' + room + '</a>');
+
       $room.addClass(room);
       $('.dropdown-content').append($room);
     }
+
   };
   
   var dropDownButton = function() {
@@ -135,7 +171,9 @@
 
   app.fetch();
 
-
+  app.clearRooms = function() {
+    $('.dropdown-content').children().remove();
+  };
 
 
 

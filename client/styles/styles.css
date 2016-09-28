@@ -87,6 +87,17 @@ form input[type=text] {
     color: #fff;
     background-color: #0090da;
 }
+
+.chatBox {
+    background-color: grey;
+    margin: 10px 10px 10px 10px;
+    border-radius: 5px;
+}
+
+.addRoom {
+    background-color: grey;
+}
+
 /*  ------------------------------------------------------------------------------ */
 /* Dropdown Button */
 .dropbtn {
